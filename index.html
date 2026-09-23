@@ -212,5 +212,27 @@
 
   <script src="app.js"></script>
 
+  <script src="app.js"></script>
+
+<script>
+document.addEventListener("click", function(event) {
+  const button = event.target.closest("button");
+
+  if (!button) return;
+
+  console.log("CLICK HTML:", button.textContent.trim());
+
+  if (button.dataset.action === "start") {
+    const menu = document.getElementById("start-menu");
+
+    if (menu) {
+      menu.classList.toggle("hidden");
+    }
+  }
+});
+</script>
+
+</body>
+</html>
 </body>
 </html>
