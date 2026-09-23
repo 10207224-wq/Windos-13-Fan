@@ -1,0 +1,16 @@
+{
+  "name": "Windows 13 Fan",
+  "short_name": "Windows 13 Fan",
+  "description": "Sistema operativo fan-made basado en tecnologías web.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b0d12",
+  "theme_color": "#0b0d12",
+  "orientation": "landscape",
+  "lang": "es",
+  "categories": [
+    "productivity",
+    "utilities",
+    "games"
+  ]
+}
