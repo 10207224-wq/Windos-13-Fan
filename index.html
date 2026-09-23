@@ -1,1 +1,216 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10131a"><link rel="manifest" href="manifest.webmanifest"><title>Windows 13 Fan</title><link rel="stylesheet" href="style.css"></head><body><main id="desktop"><button id="startBtn" class="task">Inicio</button><button id="storeBtn" class="task">Store</button><button id="settingsBtn" class="task">Configuración</button><section id="window" class="window"><header><b>Windows 13 Fan</b><button id="closeBtn">Cerrar</button></header><div id="content"><h1>Windows 13 Fan</h1><p>Escritorio web para GitHub Pages.</p><button id="helloBtn">Probar clic</button><p id="status"></p></div></section><nav id="startMenu" hidden><h2>Inicio</h2><button data-app="notas">Notas</button><button data-app="calculadora">Calculadora</button><button data-app="navegador">Navegador</button></nav></main><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0d12">
+  <meta name="description" content="Windows 13 Fan">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <title>Windows 13 Fan</title>
+</head>
+
+<body>
+
+  <div id="desktop">
+
+    <div class="desktop-background"></div>
+
+    <main class="desktop-area">
+
+      <section class="desktop-icons">
+
+        <button class="desktop-icon" data-app="explorer" data-search-name="Explorador de archivos">
+          <span class="icon-box">EX</span>
+          <span>Explorador</span>
+        </button>
+
+        <button class="desktop-icon" data-app="browser" data-search-name="Navegador">
+          <span class="icon-box">WEB</span>
+          <span>Navegador</span>
+        </button>
+
+        <button class="desktop-icon" data-app="settings" data-search-name="Configuración">
+          <span class="icon-box">CFG</span>
+          <span>Configuración</span>
+        </button>
+
+        <button class="desktop-icon" data-app="calculator" data-search-name="Calculadora">
+          <span class="icon-box">CALC</span>
+          <span>Calculadora</span>
+        </button>
+
+        <button class="desktop-icon" data-app="notes" data-search-name="Notas">
+          <span class="icon-box">TXT</span>
+          <span>Notas</span>
+        </button>
+
+        <button class="desktop-icon" data-app="terminal" data-search-name="Terminal">
+          <span class="icon-box">CMD</span>
+          <span>Terminal</span>
+        </button>
+
+        <button class="desktop-icon" data-app="paint" data-search-name="Paint">
+          <span class="icon-box">ART</span>
+          <span>Paint</span>
+        </button>
+
+        <button class="desktop-icon" data-app="store" data-search-name="Windows 13 Fan Store">
+          <span class="icon-box">APP</span>
+          <span>Store</span>
+        </button>
+
+      </section>
+
+      <section class="widgets">
+
+        <div class="widget">
+          <strong>Windows 13 Fan</strong>
+          <span>Sistema web</span>
+        </div>
+
+        <div class="widget">
+          <strong>Rendimiento</strong>
+          <span>Monitoreo disponible</span>
+        </div>
+
+      </section>
+
+    </main>
+
+    <section id="start-menu" class="start-menu hidden">
+
+      <div class="start-header">
+        <h2>Windows 13 Fan</h2>
+
+        <button data-action="close-start" class="start-close">
+          Cerrar
+        </button>
+      </div>
+
+      <div class="start-search">
+        <input
+          id="global-search"
+          type="search"
+          placeholder="Buscar aplicaciones y funciones"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="start-section">
+
+        <h3>Aplicaciones</h3>
+
+        <div id="start-apps">
+
+          <button data-action="open-app" data-app="explorer">
+            Explorador de archivos
+          </button>
+
+          <button data-action="open-app" data-app="browser">
+            Navegador
+          </button>
+
+          <button data-action="open-app" data-app="settings">
+            Configuración
+          </button>
+
+          <button data-action="open-app" data-app="calculator">
+            Calculadora
+          </button>
+
+          <button data-action="open-app" data-app="notes">
+            Notas
+          </button>
+
+          <button data-action="open-app" data-app="terminal">
+            Terminal
+          </button>
+
+          <button data-action="open-app" data-app="paint">
+            Paint
+          </button>
+
+          <button data-action="open-app" data-app="store">
+            Windows 13 Fan Store
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <footer class="taskbar">
+
+      <button
+        class="taskbar-button start-button"
+        data-action="start"
+        aria-label="Abrir Inicio"
+      >
+        W13
+      </button>
+
+      <div class="taskbar-search">
+        <input
+          id="global-search"
+          type="search"
+          placeholder="Buscar"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="taskbar-apps">
+
+        <button
+          class="taskbar-button"
+          data-action="open-app"
+          data-app="explorer"
+        >
+          Explorador
+        </button>
+
+        <button
+          class="taskbar-button"
+          data-action="open-app"
+          data-app="browser"
+        >
+          Navegador
+        </button>
+
+        <button
+          class="taskbar-button"
+          data-action="open-app"
+          data-app="store"
+        >
+          Store
+        </button>
+
+      </div>
+
+      <div class="system-tray">
+
+        <button class="tray-button">
+          Red
+        </button>
+
+        <button class="tray-button">
+          Sonido
+        </button>
+
+        <button class="tray-button">
+          Batería
+        </button>
+
+        <span id="clock">00:00</span>
+
+      </div>
+
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
