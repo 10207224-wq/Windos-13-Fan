@@ -1,3 +1,8 @@
+console.log("WINDOWS 13 FAN: app.js cargado correctamente");
+
+document.addEventListener("click", function(event) {
+  console.log("CLICK DETECTADO:", event.target);
+});
 const apps = {
   explorer: { name: "Explorador de archivos", installed: true },
   browser: { name: "Navegador", installed: true },
