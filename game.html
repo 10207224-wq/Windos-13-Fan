@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Plataforma AAA-lite</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0b0d1a; color:#fff; font-family:monospace; display:flex; flex-direction:column; align-items:center; }
+  canvas { background:#111827; border:2px solid #334; display:block; }
+  #hud { width:800px; padding:8px; display:flex; justify-content:space-between; }
+  #msg { margin-top:8px; min-height:20px; color:#fbbf24; }
+</style>
+</head>
+<body>
+<div id="hud"><span>Puntos: <b id="score">0</b></span><span>Vidas: <b id="lives">3</b></span><span>Nivel: <b id="level">1</b></span></div>
+<canvas id="c" width="800" height="450"></canvas>
+<div id="msg">Flechas/WASD para mover, Espacio para saltar. R para reiniciar.</div>
+<script>
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+const W=canvas.width,H=canvas.height;
+let keys={};
+window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key===' ')e.preventDefault();});
+window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
+
+const GRAV=0.6, JUMP=-13, SPEED=4.5;
+let player, platforms, enemies, coins, score=0, lives=3, level=1, state='play', cam=0;
+
+function resetLevel(lv){
+  level=lv;
+  platforms=[]; enemies=[]; coins=[];
+  // suelo
+  platforms.push({x:0,y:H-40,w:W*3,h:40});
+  // plataformas
+  const seed=lv*7;
+  for(let i=0;i<8+lv;i++){
+    platforms.push({x:120+i*180+ (i%2?40:0), y:H-120 - (i%3)*60, w:90+ (i%2?20:0), h:16});
+  }
+  for(let i=0;i<6+lv*2;i++){
+    coins.push({x:150+i*140, y:H-160-(i%4)*50, r:8, taken:false});
+  }
+  for(let i=0;i<3+lv;i++){
+    enemies.push({x:200+i*260, y:H-80, w:28,h:28, vx: (i%2?1.5:-1.5), alive:true});
+  }
+  player={x:50,y:H-80,w:24,h:36,vx:0,vy:0,onGround:false,facing:1,invuln:0};
+  cam=0;
+  state='play';
+  updateHud();
+}
+function updateHud(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('lives').textContent=lives;
+  document.getElementById('level').textContent=level;
+}
+
+function aabb(a,b){return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y;}
+
+function update(){
+  if(state!=='play') return;
+  // input
+  let move=0;
+  if(keys['arrowleft']||keys['a']) move=-1;
+  if(keys['arrowright']||keys['d']) move=1;
+  player.vx=move*SPEED;
+  if(move!==0) player.facing=move;
+  if((keys[' ']||keys['arrowup']||keys['w']) && player.onGround){ player.vy=JUMP; player.onGround=false; }
+  // gravedad
+  player.vy+=GRAV;
+  // movimiento x
+  player.x+=player.vx;
+  for(const p of platforms){
+    if(aabb(player,p)){
+      if(player.vx>0) player.x=p.x-player.w;
+      else if(player.vx<0) player.x=p.x+p.w;
+    }
+  }
+  // movimiento y
+  player.y+=player.vy;
+  player.onGround=false;
+  for(const p of platforms){
+    if(aabb(player,p)){
+      if(player.vy>0){ player.y=p.y-player.h; player.vy=0; player.onGround=true; }
+      else if(player.vy<0){ player.y=p.y+p.h; player.vy=0; }
+    }
+  }
+  // caida
+  if(player.y>H){ loseLife(); return; }
+  // camara
+  cam=Math.max(0, player.x - W/3);
+  // enemigos
+  for(const e of enemies){
+    if(!e.alive) continue;
+    e.x+=e.vx;
+    // rebote en plataformas bordes simples: cambiar direccion si toca borde de plataforma o pared
+    let onP=false;
+    for(const p of platforms){ if(e.x+p?false:true) {} }
+    // limites por plataformas: invertir si no hay suelo adelante
+    let groundAhead=false;
+    for(const p of platforms){
+      if(e.x+ (e.vx>0?e.w+2: -2) >= p.x && e.x+ (e.vx>0?e.w+2:-2) <= p.x+p.w && Math.abs((e.y+e.h)-p.y)<4) groundAhead=true;
+    }
+    if(!groundAhead) e.vx*=-1;
+    // colision con jugador
+    if(aabb(player,e)){
+      if(player.vy>0 && player.y+player.h - e.y < 16){
+        e.alive=false; player.vy=-8; score+=100; updateHud();
+      } else if(player.invuln<=0){
+        loseLife(); return;
+      }
+    }
+  }
+  // monedas
+  for(const c of coins){
+    if(c.taken) continue;
+    const dx=player.x+player.w/2-c.x, dy=player.y+player.h/2-c.y;
+    if(Math.hypot(dx,dy)<c.r+14){ c.taken=true; score+=50; updateHud(); }
+  }
+  if(player.invuln>0) player.invuln--;
+  // victoria nivel
+  if(coins.every(c=>c.taken) && enemies.every(e=>!e.alive)){
+    if(level>=5){ state='win'; document.getElementById('msg').textContent='¡GANASTE! R para reiniciar.'; return; }
+    resetLevel(level+1);
+  }
+}
+function loseLife(){
+  lives--; updateHud();
+  if(lives<=0){ state='gameover'; document.getElementById('msg').textContent='GAME OVER. R para reiniciar.'; }
+  else { resetLevel(level); }
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // fondo
+  const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#0b1026'); g.addColorStop(1,'#1e293b'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  ctx.save(); ctx.translate(-cam,0);
+  // plataformas
+  for(const p of platforms){
+    ctx.fillStyle='#334155'; ctx.fillRect(p.x,p.y,p.w,p.h);
+    ctx.fillStyle='#475569'; ctx.fillRect(p.x,p.y,p.w,4);
+  }
+  // monedas
+  for(const c of coins){
+    if(c.taken) continue;
+    ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fillStyle='#fbbf24'; ctx.fill();
+  }
+  // enemigos
+  for(const e of enemies){
+    if(!e.alive) continue;
+    ctx.fillStyle='#ef4444'; ctx.fillRect(e.x,e.y,e.w,e.h);
+    ctx.fillStyle='#000'; ctx.fillRect(e.x+4,e.y+6,6,6); ctx.fillRect(e.x+18,e.y+6,6,6);
+  }
+  // jugador
+  ctx.fillStyle= player.invuln>0 && (player.invuln%6<3)?'rgba(59,130,246,0.4)':'#3b82f6';
+  ctx.fillRect(player.x,player.y,player.w,player.h);
+  ctx.fillStyle='#93c5fd'; ctx.fillRect(player.x+4,player.y+6,6,6); ctx.fillRect(player.x+14,player.y+6,6,6);
+  ctx.restore();
+  // HUD overlay
+  if(state==='gameover'||state==='win'){
+    ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#fff'; ctx.font='bold 48px monospace'; ctx.textAlign='center';
+    ctx.fillText(state==='win'?'¡VICTORIA!':'GAME OVER',W/2,H/2);
+  }
+}
+
+window.addEventListener('keydown',e=>{
+  if((e.key.toLowerCase()==='r') && (state==='gameover'||state==='win')){ score=0; lives=3; resetLevel(1); document.getElementById('msg').textContent='Flechas/WASD para mover, Espacio para saltar. R para reiniciar.'; }
+});
+
+resetLevel(1);
+function loop(){ update(); draw(); requestAnimationFrame(loop); }
+loop();
+</script>
+</body>
+</html>
